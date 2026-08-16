@@ -57,7 +57,7 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
             {(profile.library_name || place) && (
               <div className="flex items-start gap-2.5 text-[15px] font-medium text-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/icons/icon-location-on.svg" alt="" width={14} height={14} className="mt-[3px] shrink-0" />
+                <img src="/profile-icons/icon-location-on.svg" alt="" width={14} height={14} className="mt-[3px] shrink-0" />
                 <div className="flex flex-col gap-0.5 text-left">
                   {profile.library_name && <span>{profile.library_name}</span>}
                   {place && <span>{place}</span>}
@@ -67,7 +67,7 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
             {profile.member_since && (
               <div className="flex items-center gap-2.5 text-[15px] font-medium text-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/icons/icon-chat.svg" alt="" width={16} height={16} className="shrink-0" />
+                <img src="/profile-icons/icon-chat.svg" alt="" width={16} height={16} className="shrink-0" />
                 <span>Using Arivu Mitra since {formatMonthYear(profile.member_since)}</span>
               </div>
             )}

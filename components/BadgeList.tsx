@@ -68,7 +68,7 @@ export function BadgeList({ badges }: { badges: Badge[] }) {
             {showAll ? 'Show less' : 'View all'}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/icons/icon-chevron.svg"
+              src="/profile-icons/icon-chevron.svg"
               alt=""
               width={10}
               height={16}

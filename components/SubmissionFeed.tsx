@@ -44,7 +44,7 @@ export function SubmissionFeed({ submissions }: { submissions: Submission[] }) {
           {expanded ? 'View less' : 'View more'}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/icons/icon-chevron.svg"
+            src="/profile-icons/icon-chevron.svg"
             alt=""
             width={10}
             height={16}
@@ -75,7 +75,7 @@ function SubmissionCard({
         {(submission.footfall_label || submission.audiences.length > 0) && (
           <p className="flex items-center gap-2 text-[13px] font-medium text-muted">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icons/icon-group.svg" alt="" width={16} height={14} className="shrink-0" />
+            <img src="/profile-icons/icon-group.svg" alt="" width={16} height={14} className="shrink-0" />
             <span>{metaLine(submission.footfall_label, submission.audiences)}</span>
           </p>
         )}

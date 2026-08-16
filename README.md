@@ -97,4 +97,6 @@ Badge artwork is a shield SVG with a portrait laid over it. The overlay insets i
 don't round them.
 
 Inter is self-hosted via `next/font`, so the page makes no external request at runtime.
-All 40 icons are served from `public/icons/`.
+All 40 icons are served from `public/profile-icons/`. The prefix is deliberate: the
+page is mounted under the same domain as the Whatomate dashboard, and nginx needs a
+path it can route here unambiguously — `/icons/` is too generic to hand over.

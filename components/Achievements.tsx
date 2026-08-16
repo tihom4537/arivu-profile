@@ -8,10 +8,10 @@ export function Achievements({ achievements }: { achievements: ProfilePayload['a
   return (
     <Section title="Achievements">
       <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
-        <StatCard icon="/icons/icon-lightning.svg" value={pluralWeeks(streak_weeks)} label="Streak maintained" />
-        <StatCard icon="/icons/icon-stars.svg" value={stars} label="Stars earned" />
+        <StatCard icon="/profile-icons/icon-lightning.svg" value={pluralWeeks(streak_weeks)} label="Streak maintained" />
+        <StatCard icon="/profile-icons/icon-stars.svg" value={stars} label="Stars earned" />
         <StatCard
-          icon="/icons/icon-people-impacted.svg"
+          icon="/profile-icons/icon-people-impacted.svg"
           value={people_reached}
           label="People reached"
           className="col-span-2"
@@ -20,7 +20,7 @@ export function Achievements({ achievements }: { achievements: ProfilePayload['a
 
       <div className="mt-3 flex items-center gap-4 rounded-lg border-2 border-line px-5 py-[18px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/belaku-level.png" alt="" className="w-10 shrink-0" />
+        <img src="/profile-icons/belaku-level.png" alt="" className="w-10 shrink-0" />
         <div className="min-w-0 flex-1">
           <div className="text-base font-bold">
             Level {level.level} · {level.name}
