@@ -1,8 +1,13 @@
 /**
  * Typed access to the profile payload from arivu-backend.
  *
- * The API is reached container-to-container over the internal network, so it is never
- * exposed publicly and needs no credentials. One request returns the whole page.
+ * This app has no backend of its own — it calls the FastAPI service that already runs
+ * in production rather than shipping a second copy of arivu-backend alongside it.
+ * The endpoint sits under /arivu/ because that path is already proxied to that
+ * service, so exposing it needed no nginx change.
+ *
+ * One request returns the whole page. Requests are server-side only, so the base URL
+ * never reaches the browser.
  */
 
 export interface Profile {
@@ -67,6 +72,7 @@ export interface ProfilePayload {
 }
 
 const API_BASE = process.env.ARIVU_API_BASE ?? 'http://localhost:8001'
+const API_PREFIX = '/arivu/public/api'
 
 async function get(path: string, label: string): Promise<ProfilePayload | null> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -82,5 +88,5 @@ async function get(path: string, label: string): Promise<ProfilePayload | null> 
 
 /** Look a library up by its GP slug — the public URL /{state}/library/{slug}. */
 export function fetchLibrary(slug: string): Promise<ProfilePayload | null> {
-  return get(`/public/api/libraries/${encodeURIComponent(slug)}`, `library ${slug}`)
+  return get(`${API_PREFIX}/libraries/${encodeURIComponent(slug)}`, `library ${slug}`)
 }
