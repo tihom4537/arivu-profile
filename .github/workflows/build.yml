@@ -1,0 +1,42 @@
+name: Build and push image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+# Build only — no deploy step. The image is pulled on the server, because the target
+# instance has under 1 GB of RAM and cannot run a Next.js production build itself.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Attestations push an extra manifest that GHCR rejects with
+          # "unknown blob" when pulled by older Docker daemons.
+          provenance: false
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/arivu-profile-web:latest
+            ghcr.io/${{ github.repository_owner }}/arivu-profile-web:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
