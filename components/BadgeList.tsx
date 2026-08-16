@@ -11,28 +11,28 @@ import { Section } from './Section'
  */
 const BADGE_ART: Record<string, { shield: string; icon: string; inset: string }> = {
   women_friendly: {
-    shield: '/icons/women-shield.svg',
-    icon: '/icons/women-icon.svg',
+    shield: '/profile-icons/women-shield.svg',
+    icon: '/profile-icons/women-icon.svg',
     inset: 'top-[13.49%] left-[5.22%] w-[91.3%] h-[67.46%]',
   },
   elder_friendly: {
-    shield: '/icons/elder-shield.svg',
-    icon: '/icons/elder-icon.svg',
+    shield: '/profile-icons/elder-shield.svg',
+    icon: '/profile-icons/elder-icon.svg',
     inset: 'top-[9.52%] left-[13.04%] w-[73.92%] h-[75.4%]',
   },
   child_friendly: {
-    shield: '/icons/child-shield.svg',
-    icon: '/icons/child-icon.svg',
+    shield: '/profile-icons/child-shield.svg',
+    icon: '/profile-icons/child-icon.svg',
     inset: 'top-[15%] left-[13.04%] w-[75.66%] h-[61.98%]',
   },
   youth_friendly: {
-    shield: '/icons/proactive-shield.svg',
-    icon: '/icons/who-women.svg',
+    shield: '/profile-icons/proactive-shield.svg',
+    icon: '/profile-icons/who-women.svg',
     inset: 'top-[15%] left-[13.04%] w-[75.66%] h-[61.98%]',
   },
   proactive: {
-    shield: '/icons/proactive-shield.svg',
-    icon: '/icons/proactive-calendar.svg',
+    shield: '/profile-icons/proactive-shield.svg',
+    icon: '/profile-icons/proactive-calendar.svg',
     inset: 'top-[7.94%] left-[6.09%] w-[87%] h-[79.36%]',
   },
 }

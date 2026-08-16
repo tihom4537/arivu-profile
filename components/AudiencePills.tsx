@@ -3,11 +3,11 @@ import { Section } from './Section'
 
 // Round portrait per audience, from the design's icon set.
 const PILL_ICON: Record<string, string> = {
-  children: '/icons/child-icon.svg',
-  adolescents: '/icons/child-icon.svg',
-  youth: '/icons/who-women.svg',
-  women: '/icons/who-women.svg',
-  elders: '/icons/who-senior.svg',
+  children: '/profile-icons/child-icon.svg',
+  adolescents: '/profile-icons/child-icon.svg',
+  youth: '/profile-icons/who-women.svg',
+  women: '/profile-icons/who-women.svg',
+  elders: '/profile-icons/who-senior.svg',
 }
 
 /**
@@ -27,7 +27,7 @@ export function AudiencePills({ audiences }: { audiences: ProfilePayload['audien
           <div key={a.key} className="flex items-center gap-2 rounded-full bg-pill py-2 pl-2 pr-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={PILL_ICON[a.key] ?? '/icons/icon-people.svg'}
+              src={PILL_ICON[a.key] ?? '/profile-icons/icon-people.svg'}
               alt=""
               className="h-7 w-7 shrink-0 rounded-full object-cover"
             />
