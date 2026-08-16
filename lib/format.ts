@@ -65,3 +65,13 @@ export function metaLine(footfall: string | null, audiences: string[]): string {
 }
 
 export const pluralWeeks = (n: number) => `${n} ${n === 1 ? 'week' : 'weeks'}`
+
+/** "Monday, 11 August 2026" — the journey cell tooltip. */
+export function formatLongDay(d: Date): string {
+  return d.toLocaleDateString('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}

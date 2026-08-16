@@ -1,61 +1,49 @@
 import type { ProfilePayload } from '@/lib/api'
 import { pluralWeeks } from '@/lib/format'
-import { Card, Section, StatTile } from './Section'
+import { Section, StatCard } from './Section'
 
-export function Achievements({
-  achievements,
-}: {
-  achievements: ProfilePayload['achievements']
-}) {
+export function Achievements({ achievements }: { achievements: ProfilePayload['achievements'] }) {
   const { streak_weeks, stars, people_reached, level } = achievements
 
   return (
     <Section title="Achievements">
-      {/* Streak and stars pair up; people-reached spans the row beneath, as designed. */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatTile emoji="⚡" value={pluralWeeks(streak_weeks)} label="Streak maintained" />
-        <StatTile emoji="⭐" value={stars} label="Stars earned" />
-        <StatTile
-          emoji="👧"
+      <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+        <StatCard icon="/icons/icon-lightning.svg" value={pluralWeeks(streak_weeks)} label="Streak maintained" />
+        <StatCard icon="/icons/icon-stars.svg" value={stars} label="Stars earned" />
+        <StatCard
+          icon="/icons/icon-people-impacted.svg"
           value={people_reached}
           label="People reached"
           className="col-span-2"
         />
       </div>
 
-      <LevelCard level={level} />
-    </Section>
-  )
-}
-
-function LevelCard({ level }: { level: ProfilePayload['achievements']['level'] }) {
-  return (
-    <Card className="mt-3 flex items-center gap-4 p-4">
-      <span className="text-[34px] leading-none" aria-hidden="true">
-        🔥
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="text-[18px] font-bold text-ink">
-          Level {level.level} · {level.name}
-        </div>
-        <div className="text-[15px] text-muted">
-          {level.stars_to_next === null
-            ? 'Highest level reached'
-            : `${level.stars_to_next} more stars to reach Level ${level.level + 1}`}
-        </div>
-        <div
-          className="mt-2 h-2 w-full overflow-hidden rounded-full bg-[#E8E8E8]"
-          role="progressbar"
-          aria-valuenow={level.progress_pct}
-          aria-valuemin={0}
-          aria-valuemax={100}
-        >
+      <div className="mt-3 flex items-center gap-4 rounded-lg border-2 border-line px-5 py-[18px]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icons/belaku-level.png" alt="" className="w-10 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <div className="text-base font-bold">
+            Level {level.level} · {level.name}
+          </div>
+          <div className="mt-0.5 text-sm font-medium text-faint">
+            {level.stars_to_next === null
+              ? 'Highest level reached'
+              : `${level.stars_to_next} more stars to reach Level ${level.level + 1}`}
+          </div>
           <div
-            className="h-full rounded-full bg-gradient-to-r from-amber to-amber-deep"
-            style={{ width: `${level.progress_pct}%` }}
-          />
+            className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-line"
+            role="progressbar"
+            aria-valuenow={level.progress_pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#ffb800] to-[#ff8a3d]"
+              style={{ width: `${level.progress_pct}%` }}
+            />
+          </div>
         </div>
       </div>
-    </Card>
+    </Section>
   )
 }

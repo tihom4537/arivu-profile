@@ -47,10 +47,10 @@ export default async function LibraryProfilePage({ params }: Params) {
   }
 
   return (
-    <main>
+    <main className="w-full max-w-page bg-white md:max-w-wide">
       <ProfileHeader profile={data.profile} />
 
-      <div className="divide-y divide-hairline">
+      <div className="flex flex-col gap-[31px] px-5 pb-[60px] pt-6">
         <JourneyHeatmap journey={data.journey} submissions={data.submissions} />
         <Achievements achievements={data.achievements} />
         <ImpactGrid impact={data.impact} />
@@ -59,7 +59,7 @@ export default async function LibraryProfilePage({ params }: Params) {
         <SubmissionFeed submissions={data.submissions} />
       </div>
 
-      <footer className="px-5 py-8 text-center text-[13px] text-muted">
+      <footer className="px-5 pb-10 text-center text-[13px] text-faint">
         Arivu Mitra · Gram Panchayat Libraries
       </footer>
     </main>

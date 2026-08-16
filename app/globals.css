@@ -7,10 +7,6 @@
     /* Landscape rotation in WhatsApp's WebView otherwise inflates text unpredictably. */
     -webkit-text-size-adjust: 100%;
   }
-
-  body {
-    @apply bg-canvas text-ink antialiased;
-  }
 }
 
 @layer utilities {
@@ -21,5 +17,16 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Diagonal hatch behind an absent photo — matches .photo-placeholder in the design. */
+  .hatch {
+    background: repeating-linear-gradient(
+      45deg,
+      #f0f0f0,
+      #f0f0f0 10px,
+      #e8e8e8 10px,
+      #e8e8e8 20px
+    );
   }
 }
