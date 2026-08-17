@@ -106,7 +106,7 @@ export function JourneyHeatmap({
             ? 'grid grid-cols-7 gap-1.5'
             : // Fixed-size cells on desktop: stretching 13 columns across a full-width
               // band would produce enormous squares.
-              'grid grid-cols-[repeat(auto-fill,minmax(16px,1fr))] gap-1'
+              'grid grid-cols-[repeat(13,1fr)] gap-1 md:grid-cols-[repeat(auto-fill,minmax(28px,1fr))]'
         }
       >
         {cells.map((d) => {
@@ -134,7 +134,7 @@ export function JourneyHeatmap({
               className={`aspect-square ${tone} ${
                 monthMode
                   ? 'flex flex-col items-center justify-center gap-0.5 rounded-cell'
-                  : 'rounded-[3px]'
+                  : 'rounded-[4px] md:max-w-[32px]'
               } ${selected ? 'outline outline-2 outline-offset-2 outline-ink' : ''}`}
             >
               {monthMode && !outOfMonth && (

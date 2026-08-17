@@ -18,10 +18,20 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
 
   return (
     <header>
-      <div className="relative h-[192px] w-full overflow-hidden md:h-[220px]">
+      {/*
+        A fixed-height full-bleed strip becomes a 13:1 letterbox on a wide monitor,
+        which crops a 16:9 photo down to a band. Height tracks the viewport instead,
+        and the focal point sits low so the building and its sign stay in frame
+        rather than the sky.
+      */}
+      <div className="relative h-[192px] w-full overflow-hidden md:h-[clamp(240px,22vw,420px)]">
         {profile.cover_photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={profile.cover_photo_url} alt="" className="block h-full w-full object-cover" />
+          <img
+            src={profile.cover_photo_url}
+            alt=""
+            className="block h-full w-full object-cover object-[center_60%]"
+          />
         ) : (
           <div className="hatch flex h-full w-full flex-col items-center justify-center gap-1.5 text-faint">
             <PlaceholderGlyph />
