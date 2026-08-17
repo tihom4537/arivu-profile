@@ -9,6 +9,15 @@ const HEAT = ['bg-heat-0', 'bg-heat-1', 'bg-heat-2', 'bg-heat-3', 'bg-heat-4']
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
+// Days per column in the yearly view.
+//
+// A contribution graph uses 7 — a column per week, a row per weekday. But a few months
+// of history is only ~22 columns, and to span a wide screen those cells would have to
+// be ~95px, making the block 700px tall. Three rows gives three times the columns, so
+// the graph fills the width at a sane cell size and stays short. The cost is that a
+// column is no longer a calendar week.
+const YEAR_ROWS = 3
+
 // Year first and selected by default; month beside it.
 const RANGES = [
   { key: 'year', label: 'Yearly' },
@@ -25,9 +34,8 @@ function level(count: number): number {
 /**
  * One cell per day, shaded by how many activities were submitted that day.
  *
- * The yearly view is laid out as a contribution graph — a column per week, a row per
- * weekday, month labels along the top — so a long span stays readable. It runs from
- * the day the librarian joined to today, rather than a fixed window.
+ * Yearly runs from the day the librarian joined to today, in columns with month
+ * labels along the top. Monthly is the current month as a weekday calendar.
  */
 export function JourneyHeatmap({
   journey,
@@ -41,7 +49,6 @@ export function JourneyHeatmap({
 
   const today = parseDay(journey.today)
   const days = journey.days
-  const monthMode = range === 'month'
 
   const byDay = useMemo(() => {
     const map: Record<string, Submission[]> = {}
@@ -51,13 +58,14 @@ export function JourneyHeatmap({
     return map
   }, [submissions])
 
-  /** Yearly: one column per week, Monday at the top. */
+  /** Yearly: consecutive days chunked into fixed-height columns, oldest first. */
   const columns = useMemo(() => {
-    const start = mondayOf(journey.start ? parseDay(journey.start) : addDays(today, -90))
+    const start = journey.start ? parseDay(journey.start) : addDays(today, -90)
+    const all: Date[] = []
+    for (let d = new Date(start); d <= today; d = addDays(d, 1)) all.push(d)
+
     const out: Date[][] = []
-    for (let d = new Date(start); d <= today; d = addDays(d, 7)) {
-      out.push(Array.from({ length: 7 }, (_, i) => addDays(d, i)))
-    }
+    for (let i = 0; i < all.length; i += YEAR_ROWS) out.push(all.slice(i, i + YEAR_ROWS))
     return out
   }, [today, journey.start])
 
@@ -70,7 +78,7 @@ export function JourneyHeatmap({
     return out
   }, [today])
 
-  // A label sits above the first column of each month, as on a contribution graph.
+  // A label sits above the first column of each month.
   const monthLabels = useMemo(
     () =>
       columns.map((col, i) => {
@@ -81,14 +89,14 @@ export function JourneyHeatmap({
     [columns],
   )
 
-  const cellFor = (d: Date, opts: { inMonth?: boolean } = {}) => {
+  const dayInfo = (d: Date, inRange = true) => {
     const iso = toISODate(d)
-    const outOfRange = opts.inMonth === false || d > today
-    const count = outOfRange ? 0 : days[iso] ?? 0
-    return { iso, count, outOfRange, lvl: level(count) }
+    const out = !inRange || d > today
+    const count = out ? 0 : days[iso] ?? 0
+    return { iso, count, out, lvl: level(count) }
   }
 
-  const openCell = (iso: string, count: number) => {
+  const toggle = (iso: string, count: number) => {
     if (count > 0) setOpenDay(openDay === iso ? null : iso)
   }
 
@@ -114,7 +122,7 @@ export function JourneyHeatmap({
         ))}
       </div>
 
-      {monthMode ? (
+      {range === 'month' ? (
         <>
           <div className="mb-1.5 grid grid-cols-7 gap-1.5">
             {WEEKDAYS.map((label, i) => (
@@ -126,16 +134,16 @@ export function JourneyHeatmap({
           <div className="grid grid-cols-7 gap-1.5">
             {monthCells.map((d) => {
               const inMonth = d.getMonth() === today.getMonth()
-              const { iso, count, outOfRange, lvl } = cellFor(d, { inMonth })
+              const { iso, count, out, lvl } = dayInfo(d, inMonth)
               return (
                 <button
                   key={iso}
                   type="button"
                   disabled={!inMonth}
                   title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
-                  onClick={() => openCell(iso, count)}
+                  onClick={() => toggle(iso, count)}
                   className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-cell ${
-                    outOfRange
+                    out
                       ? 'bg-transparent text-[#c4c4c4] opacity-40'
                       : `${HEAT[lvl]} ${lvl >= 2 ? 'text-white' : 'text-muted'}`
                   } ${openDay === iso ? 'outline outline-2 outline-offset-2 outline-ink' : ''}`}
@@ -152,17 +160,19 @@ export function JourneyHeatmap({
           </div>
         </>
       ) : (
-        // Scrolls horizontally rather than shrinking the cells: a year is 52 columns,
-        // which will not fit a phone at a legible size.
+        // Columns share the width rather than sitting at a fixed size, so the graph
+        // fills whatever band it is given. Floored so a long history scrolls on a
+        // phone instead of collapsing to slivers, capped so a short one does not
+        // stretch into oversized tiles.
         <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
-          <div className="inline-flex flex-col gap-1">
+          <div className="flex min-w-full flex-col gap-1">
             <div className="flex gap-1 md:gap-1.5">
               {monthLabels.map((label, i) => (
-                // Fixed to the column width; the text is allowed to overflow to the
-                // right, which is what keeps it aligned to the month's first column.
+                // Sized to the column; the text overflows to the right, which keeps
+                // each label above the column its month begins in.
                 <span
                   key={i}
-                  className="w-[13px] shrink-0 whitespace-nowrap text-[11px] font-semibold leading-none text-faint md:w-7"
+                  className="min-w-[11px] max-w-[44px] flex-1 whitespace-nowrap text-[11px] font-semibold leading-none text-faint"
                 >
                   {label}
                 </span>
@@ -171,18 +181,24 @@ export function JourneyHeatmap({
 
             <div className="flex gap-1 md:gap-1.5">
               {columns.map((col, i) => (
-                <div key={i} className="flex shrink-0 flex-col gap-1 md:gap-1.5">
-                  {col.map((d) => {
-                    const { iso, count, outOfRange, lvl } = cellFor(d)
+                <div
+                  key={i}
+                  className="flex min-w-[11px] max-w-[44px] flex-1 flex-col gap-1 md:gap-1.5"
+                >
+                  {Array.from({ length: YEAR_ROWS }, (_, r) => col[r]).map((d, r) => {
+                    // The final column can be short; pad it so its cells stay the
+                    // same size as every other column's.
+                    if (!d) return <span key={`pad-${r}`} className="aspect-square w-full" />
+                    const { iso, count, out, lvl } = dayInfo(d)
                     return (
                       <button
                         key={iso}
                         type="button"
-                        disabled={outOfRange}
+                        disabled={out}
                         title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
-                        onClick={() => openCell(iso, count)}
-                        className={`h-[13px] w-[13px] rounded-[3px] md:h-7 md:w-7 md:rounded-[6px] ${
-                          outOfRange ? 'bg-transparent' : HEAT[lvl]
+                        onClick={() => toggle(iso, count)}
+                        className={`aspect-square w-full rounded-[3px] md:rounded-[6px] ${
+                          out ? 'bg-transparent' : HEAT[lvl]
                         } ${openDay === iso ? 'outline outline-2 outline-offset-1 outline-ink' : ''}`}
                       />
                     )
