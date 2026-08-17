@@ -10,8 +10,8 @@ const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
 // Year first and selected by default; month beside it.
 const RANGES = [
-  { key: 'year', label: 'This year' },
-  { key: 'month', label: 'This month' },
+  { key: 'year', label: 'Yearly' },
+  { key: 'month', label: 'Monthly' },
 ] as const
 
 type Range = (typeof RANGES)[number]['key']
@@ -106,7 +106,7 @@ export function JourneyHeatmap({
             ? 'grid grid-cols-7 gap-1.5'
             : // Fixed-size cells on desktop: stretching 13 columns across a full-width
               // band would produce enormous squares.
-              'grid grid-cols-[repeat(13,1fr)] gap-1 md:grid-cols-[repeat(auto-fill,minmax(28px,1fr))]'
+              'grid grid-cols-[repeat(auto-fill,minmax(16px,1fr))] gap-1'
         }
       >
         {cells.map((d) => {
@@ -121,7 +121,7 @@ export function JourneyHeatmap({
           // utilities by its own rules, not by class-string order.
           const tone =
             outOfMonth || future
-              ? 'bg-transparent text-[#c4c4c4]'
+              ? 'bg-transparent text-[#c4c4c4] opacity-40'
               : `${HEAT[lvl]} ${lvl >= 2 ? 'text-white' : 'text-muted'}`
 
           return (
@@ -134,7 +134,7 @@ export function JourneyHeatmap({
               className={`aspect-square ${tone} ${
                 monthMode
                   ? 'flex flex-col items-center justify-center gap-0.5 rounded-cell'
-                  : 'rounded-[4px] md:max-w-[32px]'
+                  : 'rounded-[3px]'
               } ${selected ? 'outline outline-2 outline-offset-2 outline-ink' : ''}`}
             >
               {monthMode && !outOfMonth && (

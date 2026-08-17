@@ -19,9 +19,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!data) return {}
 
   const { profile, achievements } = data
-  const title = [profile.library_name || profile.gram_panchayat, profile.name]
-    .filter(Boolean)
-    .join(' — ')
+  // The tab and any shared link name the library, which is what the page is about.
+  const title = profile.library_name ?? `${profile.gram_panchayat ?? 'Arivu Kendra'} Library`
 
   return {
     title,

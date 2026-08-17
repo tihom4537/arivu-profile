@@ -3,16 +3,21 @@ import type { ReactNode } from 'react'
 /** Section heading + optional subtitle. Sizes follow .section-title / .section-subtitle. */
 export function Section({
   title,
+  count,
   subtitle,
   children,
 }: {
   title: string
+  count?: number
   subtitle?: string
   children: ReactNode
 }) {
   return (
     <section>
-      <h2 className="mb-[15px] text-[21px] font-bold leading-[26px]">{title}</h2>
+      <h2 className="mb-[15px] text-[21px] font-bold leading-[26px]">
+        {title}
+        {count !== undefined && <span className="text-count-fg"> ({count})</span>}
+      </h2>
       {subtitle && (
         <p className="-mt-[9px] mb-[15px] text-sm font-medium text-muted">{subtitle}</p>
       )}

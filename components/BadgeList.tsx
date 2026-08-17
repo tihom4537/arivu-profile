@@ -1,6 +1,3 @@
-'use client'
-
-import { useState } from 'react'
 import type { Badge } from '@/lib/api'
 import { Section } from './Section'
 
@@ -38,44 +35,23 @@ const BADGE_ART: Record<string, { shield: string; icon: string; inset: string }>
 }
 
 export function BadgeList({ badges }: { badges: Badge[] }) {
-  const [showAll, setShowAll] = useState(false)
-
   const earned = badges.filter((b) => b.earned)
-  const visible = showAll ? badges : earned
-  const hasMore = earned.length < badges.length
 
   if (badges.length === 0) return null
 
   return (
-    <Section title="Badges earned">
+    <Section title="Badges earned" count={earned.length}>
       <div className="overflow-hidden rounded-lg border-2 border-line">
-        {visible.length === 0 && (
+        {earned.length === 0 && (
           <p className="px-5 py-4 text-[15px] font-medium text-muted">
             No badges yet — they unlock as you run more activities.
           </p>
         )}
 
-        {visible.map((badge, i) => (
-          <BadgeRow key={badge.key} badge={badge} last={i === visible.length - 1 && !hasMore} />
+        {earned.map((badge, i) => (
+          <BadgeRow key={badge.key} badge={badge} last={i === earned.length - 1} />
         ))}
 
-        {hasMore && (
-          <button
-            type="button"
-            onClick={() => setShowAll((v) => !v)}
-            className="flex w-full items-center justify-between px-5 py-4 text-[17px] font-bold text-[#4b4b4b] hover:bg-soft"
-          >
-            {showAll ? 'Show less' : 'View all'}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/profile-icons/icon-chevron.svg"
-              alt=""
-              width={10}
-              height={16}
-              className={showAll ? 'rotate-[270deg] transition-transform' : 'transition-transform'}
-            />
-          </button>
-        )}
       </div>
     </Section>
   )

@@ -6,7 +6,13 @@ import { formatMonthYear } from '@/lib/format'
  * Measurements follow the design's .cover / .avatar / .profile rules.
  */
 export function ProfileHeader({ profile }: { profile: Profile }) {
-  const place = [profile.district, profile.taluk && `${profile.taluk} Taluk`]
+  // "Dodjala H Gram Panchayat | Yelahanka Taluk | Bengaluru", skipping the unknown.
+  // Bulk-loaded records often carry only the GP, so every part is optional.
+  const place = [
+    profile.gram_panchayat && `${profile.gram_panchayat} Gram Panchayat`,
+    profile.taluk && `${profile.taluk} Taluk`,
+    profile.district,
+  ]
     .filter(Boolean)
     .join('  |  ')
 
@@ -27,10 +33,10 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
       {/* -65px lifts the avatar over the cover, as in .profile */}
       <section
         className="relative z-[1] -mt-[65px] flex flex-col items-center gap-5 border-b-2 border-line px-5 pb-[15px]
-                   md:-mt-[58px] md:items-start md:px-[clamp(40px,6vw,120px)] md:pb-7
+                   md:-mt-[74px] md:items-start md:px-[clamp(40px,6vw,120px)] md:pb-7
                    wide:px-[clamp(120px,10vw,220px)]"
       >
-        <div className="relative z-[2] h-[116px] w-[116px] overflow-hidden rounded-full border-[7px] border-amber-ring bg-[#eee]">
+        <div className="relative z-[2] h-[116px] w-[116px] overflow-hidden rounded-full border-[7px] border-amber-ring bg-[#eee] md:h-[148px] md:w-[148px]">
           {profile.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={profile.photo_url} alt="" className="h-full w-full object-cover" />
@@ -43,9 +49,11 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
 
         <div className="flex w-full flex-col items-center gap-5 md:flex-row md:items-end md:justify-between md:gap-8">
           <div className="flex flex-col items-center gap-0.5 text-center md:items-start md:text-left">
-            <div className="text-[25px] font-bold leading-[34px]">{profile.name}</div>
-            <div className="mt-0.5 flex items-center gap-2">
-              <span className="text-[15px] font-medium leading-5 text-faint">Librarian</span>
+            <div className="text-[25px] font-bold leading-[34px]">{profile.library_name}</div>
+            <div className="mt-0.5 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+              <span className="text-[15px] font-medium leading-5 text-muted">
+                <span className="font-semibold">Librarian</span> {profile.name}
+              </span>
               {profile.years_of_service !== null && (
                 <>
                   <span className="text-[13px] text-line">|</span>
@@ -58,14 +66,11 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
           </div>
 
           <div className="flex w-full flex-col items-center gap-2 md:w-auto md:shrink-0 md:items-end md:text-right">
-            {(profile.library_name || place) && (
+            {place && (
               <div className="flex items-start gap-2.5 text-[15px] font-medium text-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/profile-icons/icon-location-on.svg" alt="" width={14} height={14} className="mt-[3px] shrink-0" />
-                <div className="flex flex-col gap-0.5 text-left md:text-right">
-                  {profile.library_name && <span>{profile.library_name}</span>}
-                  {place && <span>{place}</span>}
-                </div>
+                <span className="text-left md:text-right">{place}</span>
               </div>
             )}
             {profile.member_since && (
