@@ -41,6 +41,14 @@ export interface Badge {
   target: number
 }
 
+/** One ISO week of the journey heatmap, coloured by WhatsApp engagement. */
+export interface JourneyWeek {
+  week_start: string
+  incoming: number
+  level: number          // 0-4, indexes the heat ramp
+  label: string          // silent | active | power user
+}
+
 export interface Submission {
   id: string
   title: string
@@ -53,7 +61,12 @@ export interface Submission {
 
 export interface ProfilePayload {
   profile: Profile
-  journey: { days: Record<string, number>; year: number; today: string }
+  journey: {
+    weeks: JourneyWeek[]
+    days: Record<string, number>
+    year: number
+    today: string
+  }
   achievements: {
     streak_weeks: number
     stars: number

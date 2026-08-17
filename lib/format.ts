@@ -54,17 +54,24 @@ export function addDays(d: Date, n: number): Date {
   return out
 }
 
-/** Matches HEATMAP_STEPS in app/public/profile_stats.py. */
-export function heatmapLevel(count: number): number {
-  return Math.min(count, 4)
-}
-
 /** "More than 30 · Children (6–12), Women" — the activity meta line. */
 export function metaLine(footfall: string | null, audiences: string[]): string {
   return [footfall, audiences.join(', ')].filter(Boolean).join(' · ')
 }
 
 export const pluralWeeks = (n: number) => `${n} ${n === 1 ? 'week' : 'weeks'}`
+
+/** "11–17 Aug" — labels one week of the journey heatmap. */
+export function formatWeekRange(isoMonday: string): string {
+  const start = parseDay(isoMonday)
+  const end = new Date(start)
+  end.setDate(start.getDate() + 6)
+  const sameMonth = start.getMonth() === end.getMonth()
+  const startLabel = sameMonth
+    ? `${start.getDate()}`
+    : `${start.getDate()} ${MONTHS[start.getMonth()]}`
+  return `${startLabel}–${end.getDate()} ${MONTHS[end.getMonth()]}`
+}
 
 /** "Monday, 11 August 2026" — the journey cell tooltip. */
 export function formatLongDay(d: Date): string {
