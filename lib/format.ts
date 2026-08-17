@@ -61,18 +61,6 @@ export function metaLine(footfall: string | null, audiences: string[]): string {
 
 export const pluralWeeks = (n: number) => `${n} ${n === 1 ? 'week' : 'weeks'}`
 
-/** "11–17 Aug" — labels one week of the journey heatmap. */
-export function formatWeekRange(isoMonday: string): string {
-  const start = parseDay(isoMonday)
-  const end = new Date(start)
-  end.setDate(start.getDate() + 6)
-  const sameMonth = start.getMonth() === end.getMonth()
-  const startLabel = sameMonth
-    ? `${start.getDate()}`
-    : `${start.getDate()} ${MONTHS[start.getMonth()]}`
-  return `${startLabel}–${end.getDate()} ${MONTHS[end.getMonth()]}`
-}
-
 /** "Monday, 11 August 2026" — the journey cell tooltip. */
 export function formatLongDay(d: Date): string {
   return d.toLocaleDateString('en-IN', {
