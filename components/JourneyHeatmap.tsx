@@ -13,10 +13,10 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 //
 // A contribution graph uses 7 — a column per week, a row per weekday. But a few months
 // of history is only ~22 columns, and to span a wide screen those cells would have to
-// be ~95px, making the block 700px tall. Three rows gives three times the columns, so
-// the graph fills the width at a sane cell size and stays short. The cost is that a
+// be ~95px, making the block 700px tall. Four rows gives nearly twice the columns, so
+// the graph fills the width with chunky cells and stays short. The cost is that a
 // column is no longer a calendar week.
-const YEAR_ROWS = 3
+const YEAR_ROWS = 4
 
 // Year first and selected by default; month beside it.
 const RANGES = [
@@ -69,13 +69,14 @@ export function JourneyHeatmap({
     return out
   }, [today, journey.start])
 
-  /** Monthly: the whole current month, padded to Monday so the columns line up. */
+  /**
+   * Monthly: a fixed 4 weeks from the Monday of the week containing the 1st, so the
+   * grid is always a clean 7x4 rather than running to five or six ragged rows.
+   */
   const monthCells = useMemo(() => {
     const first = new Date(today.getFullYear(), today.getMonth(), 1)
-    const last = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-    const out: Date[] = []
-    for (let d = mondayOf(first); d <= last; d = addDays(d, 1)) out.push(d)
-    return out
+    const start = mondayOf(first)
+    return Array.from({ length: 28 }, (_, i) => addDays(start, i))
   }, [today])
 
   // A label sits above the first column of each month.
@@ -166,29 +167,29 @@ export function JourneyHeatmap({
         // stretch into oversized tiles.
         <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
           <div className="flex min-w-full flex-col gap-1">
-            <div className="flex gap-1 md:gap-1.5">
+            <div className="flex gap-1 md:gap-2">
               {monthLabels.map((label, i) => (
                 // Sized to the column; the text overflows to the right, which keeps
                 // each label above the column its month begins in.
                 <span
                   key={i}
-                  className="min-w-[11px] max-w-[44px] flex-1 whitespace-nowrap text-[11px] font-semibold leading-none text-faint"
+                  className="min-w-[11px] flex-1 whitespace-nowrap text-center text-[11px] font-semibold leading-none text-faint"
                 >
                   {label}
                 </span>
               ))}
             </div>
 
-            <div className="flex gap-1 md:gap-1.5">
+            <div className="flex gap-1 md:gap-2">
               {columns.map((col, i) => (
                 <div
                   key={i}
-                  className="flex min-w-[11px] max-w-[44px] flex-1 flex-col gap-1 md:gap-1.5"
+                  className="flex min-w-[11px] flex-1 flex-col items-center gap-1 md:gap-2"
                 >
                   {Array.from({ length: YEAR_ROWS }, (_, r) => col[r]).map((d, r) => {
                     // The final column can be short; pad it so its cells stay the
                     // same size as every other column's.
-                    if (!d) return <span key={`pad-${r}`} className="aspect-square w-full" />
+                    if (!d) return <span key={`pad-${r}`} className="aspect-square w-full max-w-[40px]" />
                     const { iso, count, out, lvl } = dayInfo(d)
                     return (
                       <button
@@ -197,7 +198,7 @@ export function JourneyHeatmap({
                         disabled={out}
                         title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
                         onClick={() => toggle(iso, count)}
-                        className={`aspect-square w-full rounded-[3px] md:rounded-[6px] ${
+                        className={`aspect-square w-full max-w-[40px] rounded-[3px] md:rounded-[8px] ${
                           out ? 'bg-transparent' : HEAT[lvl]
                         } ${openDay === iso ? 'outline outline-2 outline-offset-1 outline-ink' : ''}`}
                       />
