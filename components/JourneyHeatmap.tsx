@@ -156,22 +156,22 @@ export function JourneyHeatmap({
         // which will not fit a phone at a legible size.
         <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
           <div className="inline-flex flex-col gap-1">
-            <div className="flex gap-1">
+            <div className="flex gap-1 md:gap-1.5">
               {monthLabels.map((label, i) => (
                 // Fixed to the column width; the text is allowed to overflow to the
                 // right, which is what keeps it aligned to the month's first column.
                 <span
                   key={i}
-                  className="w-[13px] shrink-0 whitespace-nowrap text-[10px] font-semibold leading-none text-faint md:w-[15px]"
+                  className="w-[13px] shrink-0 whitespace-nowrap text-[11px] font-semibold leading-none text-faint md:w-7"
                 >
                   {label}
                 </span>
               ))}
             </div>
 
-            <div className="flex gap-1">
+            <div className="flex gap-1 md:gap-1.5">
               {columns.map((col, i) => (
-                <div key={i} className="flex shrink-0 flex-col gap-1">
+                <div key={i} className="flex shrink-0 flex-col gap-1 md:gap-1.5">
                   {col.map((d) => {
                     const { iso, count, outOfRange, lvl } = cellFor(d)
                     return (
@@ -181,7 +181,7 @@ export function JourneyHeatmap({
                         disabled={outOfRange}
                         title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
                         onClick={() => openCell(iso, count)}
-                        className={`h-[13px] w-[13px] rounded-[3px] md:h-[15px] md:w-[15px] ${
+                        className={`h-[13px] w-[13px] rounded-[3px] md:h-7 md:w-7 md:rounded-[6px] ${
                           outOfRange ? 'bg-transparent' : HEAT[lvl]
                         } ${openDay === iso ? 'outline outline-2 outline-offset-1 outline-ink' : ''}`}
                       />
