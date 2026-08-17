@@ -7,6 +7,7 @@ import { Section } from './Section'
 
 const HEAT = ['bg-heat-0', 'bg-heat-1', 'bg-heat-2', 'bg-heat-3', 'bg-heat-4']
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 // Year first and selected by default; month beside it.
 const RANGES = [
@@ -24,9 +25,9 @@ function level(count: number): number {
 /**
  * One cell per day, shaded by how many activities were submitted that day.
  *
- * The full view runs from the day the librarian joined to today, rather than a fixed
- * window — someone onboarded in June should not open their page to months of empty
- * cells predating them.
+ * The yearly view is laid out as a contribution graph — a column per week, a row per
+ * weekday, month labels along the top — so a long span stays readable. It runs from
+ * the day the librarian joined to today, rather than a fixed window.
  */
 export function JourneyHeatmap({
   journey,
@@ -40,6 +41,7 @@ export function JourneyHeatmap({
 
   const today = parseDay(journey.today)
   const days = journey.days
+  const monthMode = range === 'month'
 
   const byDay = useMemo(() => {
     const map: Record<string, Submission[]> = {}
@@ -49,24 +51,46 @@ export function JourneyHeatmap({
     return map
   }, [submissions])
 
-  const cells = useMemo(() => {
-    if (range === 'month') {
-      // Whole current month, so it reads as a calendar rather than stopping mid-grid.
-      const first = new Date(today.getFullYear(), today.getMonth(), 1)
-      const last = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-      const out: Date[] = []
-      // Pad to Monday so weekday columns line up.
-      for (let d = mondayOf(first); d <= last; d = addDays(d, 1)) out.push(d)
-      return out
+  /** Yearly: one column per week, Monday at the top. */
+  const columns = useMemo(() => {
+    const start = mondayOf(journey.start ? parseDay(journey.start) : addDays(today, -90))
+    const out: Date[][] = []
+    for (let d = new Date(start); d <= today; d = addDays(d, 7)) {
+      out.push(Array.from({ length: 7 }, (_, i) => addDays(d, i)))
     }
-
-    const start = journey.start ? parseDay(journey.start) : addDays(today, -90)
-    const out: Date[] = []
-    for (let d = new Date(start); d <= today; d = addDays(d, 1)) out.push(d)
     return out
-  }, [range, today, journey.start])
+  }, [today, journey.start])
 
-  const monthMode = range === 'month'
+  /** Monthly: the whole current month, padded to Monday so the columns line up. */
+  const monthCells = useMemo(() => {
+    const first = new Date(today.getFullYear(), today.getMonth(), 1)
+    const last = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    const out: Date[] = []
+    for (let d = mondayOf(first); d <= last; d = addDays(d, 1)) out.push(d)
+    return out
+  }, [today])
+
+  // A label sits above the first column of each month, as on a contribution graph.
+  const monthLabels = useMemo(
+    () =>
+      columns.map((col, i) => {
+        const month = col[0].getMonth()
+        if (i > 0 && columns[i - 1][0].getMonth() === month) return ''
+        return MONTHS[month]
+      }),
+    [columns],
+  )
+
+  const cellFor = (d: Date, opts: { inMonth?: boolean } = {}) => {
+    const iso = toISODate(d)
+    const outOfRange = opts.inMonth === false || d > today
+    const count = outOfRange ? 0 : days[iso] ?? 0
+    return { iso, count, outOfRange, lvl: level(count) }
+  }
+
+  const openCell = (iso: string, count: number) => {
+    if (count > 0) setOpenDay(openDay === iso ? null : iso)
+  }
 
   return (
     <Section title="Your journey this year">
@@ -90,63 +114,85 @@ export function JourneyHeatmap({
         ))}
       </div>
 
-      {monthMode && (
-        <div className="mb-1.5 grid grid-cols-7 gap-1.5">
-          {WEEKDAYS.map((label, i) => (
-            <span key={i} className="text-center text-[11px] font-bold text-faint">
-              {label}
-            </span>
-          ))}
+      {monthMode ? (
+        <>
+          <div className="mb-1.5 grid grid-cols-7 gap-1.5">
+            {WEEKDAYS.map((label, i) => (
+              <span key={i} className="text-center text-[11px] font-bold text-faint">
+                {label}
+              </span>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1.5">
+            {monthCells.map((d) => {
+              const inMonth = d.getMonth() === today.getMonth()
+              const { iso, count, outOfRange, lvl } = cellFor(d, { inMonth })
+              return (
+                <button
+                  key={iso}
+                  type="button"
+                  disabled={!inMonth}
+                  title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
+                  onClick={() => openCell(iso, count)}
+                  className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-cell ${
+                    outOfRange
+                      ? 'bg-transparent text-[#c4c4c4] opacity-40'
+                      : `${HEAT[lvl]} ${lvl >= 2 ? 'text-white' : 'text-muted'}`
+                  } ${openDay === iso ? 'outline outline-2 outline-offset-2 outline-ink' : ''}`}
+                >
+                  {inMonth && (
+                    <>
+                      <span className="text-[15px] font-bold">{d.getDate()}</span>
+                      {count > 0 && <span className="h-1 w-1 rounded-full bg-current opacity-70" />}
+                    </>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </>
+      ) : (
+        // Scrolls horizontally rather than shrinking the cells: a year is 52 columns,
+        // which will not fit a phone at a legible size.
+        <div className="-mx-5 overflow-x-auto px-5 md:mx-0 md:px-0">
+          <div className="inline-flex flex-col gap-1">
+            <div className="flex gap-1">
+              {monthLabels.map((label, i) => (
+                // Fixed to the column width; the text is allowed to overflow to the
+                // right, which is what keeps it aligned to the month's first column.
+                <span
+                  key={i}
+                  className="w-[13px] shrink-0 whitespace-nowrap text-[10px] font-semibold leading-none text-faint md:w-[15px]"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+
+            <div className="flex gap-1">
+              {columns.map((col, i) => (
+                <div key={i} className="flex shrink-0 flex-col gap-1">
+                  {col.map((d) => {
+                    const { iso, count, outOfRange, lvl } = cellFor(d)
+                    return (
+                      <button
+                        key={iso}
+                        type="button"
+                        disabled={outOfRange}
+                        title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
+                        onClick={() => openCell(iso, count)}
+                        className={`h-[13px] w-[13px] rounded-[3px] md:h-[15px] md:w-[15px] ${
+                          outOfRange ? 'bg-transparent' : HEAT[lvl]
+                        } ${openDay === iso ? 'outline outline-2 outline-offset-1 outline-ink' : ''}`}
+                      />
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
-
-      <div
-        className={
-          monthMode
-            ? 'grid grid-cols-7 gap-1.5'
-            : // Fixed-size cells on desktop: stretching 13 columns across a full-width
-              // band would produce enormous squares.
-              'grid grid-cols-[repeat(13,1fr)] gap-1 md:grid-cols-[repeat(auto-fill,minmax(28px,1fr))]'
-        }
-      >
-        {cells.map((d) => {
-          const iso = toISODate(d)
-          const outOfMonth = monthMode && d.getMonth() !== today.getMonth()
-          const future = d > today
-          const count = outOfMonth || future ? 0 : days[iso] ?? 0
-          const lvl = level(count)
-          const selected = openDay === iso
-
-          // One colour decision rather than two overlapping ones — Tailwind orders
-          // utilities by its own rules, not by class-string order.
-          const tone =
-            outOfMonth || future
-              ? 'bg-transparent text-[#c4c4c4] opacity-40'
-              : `${HEAT[lvl]} ${lvl >= 2 ? 'text-white' : 'text-muted'}`
-
-          return (
-            <button
-              key={iso}
-              type="button"
-              disabled={outOfMonth}
-              title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
-              onClick={() => count > 0 && setOpenDay(selected ? null : iso)}
-              className={`aspect-square ${tone} ${
-                monthMode
-                  ? 'flex flex-col items-center justify-center gap-0.5 rounded-cell'
-                  : 'rounded-[4px] md:max-w-[32px]'
-              } ${selected ? 'outline outline-2 outline-offset-2 outline-ink' : ''}`}
-            >
-              {monthMode && !outOfMonth && (
-                <>
-                  <span className="text-[15px] font-bold">{d.getDate()}</span>
-                  {count > 0 && <span className="h-1 w-1 rounded-full bg-current opacity-70" />}
-                </>
-              )}
-            </button>
-          )
-        })}
-      </div>
 
       <p className="mt-[30px] text-[13px] font-medium text-muted">
         Every green box means you did some activity that day.
