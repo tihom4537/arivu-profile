@@ -93,11 +93,13 @@ Two breakpoints, both from the design:
 - **<768px** — the 412px phone column, sections stacked in source order.
 - **>=768px** — full width. An audience band across the top, the activity feed on the
   left with a 372px stat sidebar (achievements, impact, badges) on the right, and the
-  journey band across the bottom. Placement is explicit grid row/column rather than
-  source order, so mobile keeps its own sequence. The feed drops its "View more" and
-  shows everything, since there it is its own column and a long scroll reads fine.
-- **>=1400px** — the feed splits 2-up, because one stacked card in a column that wide
-  reads too long and thin. Side padding opens up too.
+  journey band on top, then the audience band. Placement is explicit grid row/column
+  rather than source order, so mobile keeps its own sequence. Six activities show by
+  default behind a "View more"; six is what keeps the feed finishing level with the
+  badges list beside it.
+- **>=1024px** — the feed splits 2-up, so those six read as three rows rather than a
+  column twice the sidebar's height. Below this the column is too narrow to split.
+- **>=1400px** — side padding opens up further.
 
 Badge artwork is a shield SVG with a portrait laid over it. The overlay insets in
 `components/BadgeList.tsx` are the percentages from the design's `.women-icon` /

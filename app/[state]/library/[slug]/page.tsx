@@ -52,10 +52,9 @@ export default async function LibraryProfilePage({ params }: Params) {
 
       {/*
         Mobile: one column, in the order the sections are written.
-        Desktop: a named two-column grid — audience band across the top, activity feed
-        on the left with the stat sidebar on the right, journey band across the bottom.
-        Placement is explicit so the desktop arrangement does not depend on DOM order,
-        which lets mobile keep its own sequence.
+        Desktop: journey band, then audience band, then the activity feed on the left
+        with the stat sidebar on the right. Placement is explicit grid row/column so
+        the arrangement does not depend on DOM order.
       */}
       <div
         className="flex flex-col gap-[31px] px-5 pb-[60px] pt-6
@@ -63,22 +62,22 @@ export default async function LibraryProfilePage({ params }: Params) {
                    md:px-[clamp(40px,6vw,120px)] md:pb-16 md:pt-8
                    wide:px-[clamp(120px,10vw,220px)]"
       >
-        <div className="md:col-span-2 md:col-start-1 md:row-start-3">
+        <div className="md:col-span-2 md:col-start-1 md:row-start-1">
           <JourneyHeatmap journey={data.journey} submissions={data.submissions} />
         </div>
 
         {/* Nested a level deeper than the other sections, so it carries its own gap. */}
-        <div className="flex flex-col gap-[31px] md:col-start-2 md:row-start-2">
+        <div className="flex flex-col gap-[31px] md:col-start-2 md:row-start-3">
           <Achievements achievements={data.achievements} />
           <ImpactGrid impact={data.impact} />
           <BadgeList badges={data.badges} />
         </div>
 
-        <div className="md:col-span-2 md:col-start-1 md:row-start-1">
+        <div className="md:col-span-2 md:col-start-1 md:row-start-2">
           <AudiencePills audiences={data.audiences} />
         </div>
 
-        <div className="md:col-start-1 md:row-start-2">
+        <div className="md:col-start-1 md:row-start-3">
           <SubmissionFeed submissions={data.submissions} />
         </div>
       </div>
