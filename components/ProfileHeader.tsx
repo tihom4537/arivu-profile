@@ -12,7 +12,7 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
 
   return (
     <header>
-      <div className="relative h-[192px] w-full overflow-hidden">
+      <div className="relative h-[192px] w-full overflow-hidden md:h-[220px]">
         {profile.cover_photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={profile.cover_photo_url} alt="" className="block h-full w-full object-cover" />
@@ -25,7 +25,11 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
       </div>
 
       {/* -65px lifts the avatar over the cover, as in .profile */}
-      <section className="relative z-[1] -mt-[65px] flex flex-col items-center gap-5 border-b-2 border-line px-5 pb-[15px]">
+      <section
+        className="relative z-[1] -mt-[65px] flex flex-col items-center gap-5 border-b-2 border-line px-5 pb-[15px]
+                   md:-mt-[58px] md:items-start md:px-[clamp(40px,6vw,120px)] md:pb-7
+                   wide:px-[clamp(120px,10vw,220px)]"
+      >
         <div className="relative z-[2] h-[116px] w-[116px] overflow-hidden rounded-full border-[7px] border-amber-ring bg-[#eee]">
           {profile.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -37,8 +41,8 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
           )}
         </div>
 
-        <div className="flex w-full flex-col items-center gap-5">
-          <div className="flex flex-col items-center gap-0.5 text-center">
+        <div className="flex w-full flex-col items-center gap-5 md:flex-row md:items-end md:justify-between md:gap-8">
+          <div className="flex flex-col items-center gap-0.5 text-center md:items-start md:text-left">
             <div className="text-[25px] font-bold leading-[34px]">{profile.name}</div>
             <div className="mt-0.5 flex items-center gap-2">
               <span className="text-[15px] font-medium leading-5 text-faint">Librarian</span>
@@ -53,12 +57,12 @@ export function ProfileHeader({ profile }: { profile: Profile }) {
             </div>
           </div>
 
-          <div className="flex w-full flex-col items-center gap-2">
+          <div className="flex w-full flex-col items-center gap-2 md:w-auto md:shrink-0 md:items-end md:text-right">
             {(profile.library_name || place) && (
               <div className="flex items-start gap-2.5 text-[15px] font-medium text-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/profile-icons/icon-location-on.svg" alt="" width={14} height={14} className="mt-[3px] shrink-0" />
-                <div className="flex flex-col gap-0.5 text-left">
+                <div className="flex flex-col gap-0.5 text-left md:text-right">
                   {profile.library_name && <span>{profile.library_name}</span>}
                   {place && <span>{place}</span>}
                 </div>

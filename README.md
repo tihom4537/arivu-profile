@@ -88,8 +88,16 @@ Built from the design source in `Librarian Profile page/` (index.html + styles.c
 Tokens in `tailwind.config.ts` are named after the CSS custom properties they came
 from, so the two can be diffed: `ink` = `--text-dark`, `line` = `--border`, and so on.
 
-The column is a fixed 412px as designed; wider viewports keep that column and only the
-activity feed widens, to three across.
+Two breakpoints, both from the design:
+
+- **<768px** — the 412px phone column, sections stacked in source order.
+- **>=768px** — full width. An audience band across the top, the activity feed on the
+  left with a 372px stat sidebar (achievements, impact, badges) on the right, and the
+  journey band across the bottom. Placement is explicit grid row/column rather than
+  source order, so mobile keeps its own sequence. The feed drops its "View more" and
+  shows everything, since there it is its own column and a long scroll reads fine.
+- **>=1400px** — the feed splits 2-up, because one stacked card in a column that wide
+  reads too long and thin. Side padding opens up too.
 
 Badge artwork is a shield SVG with a portrait laid over it. The overlay insets in
 `components/BadgeList.tsx` are the percentages from the design's `.women-icon` /

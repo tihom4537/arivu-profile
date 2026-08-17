@@ -76,7 +76,15 @@ export function JourneyHeatmap({
         </div>
       )}
 
-      <div className={range === 'week' ? 'grid grid-cols-7 gap-1.5' : 'grid grid-cols-[repeat(13,1fr)] gap-1'}>
+      <div
+        className={
+          range === 'week'
+            ? 'grid grid-cols-7 gap-1.5'
+            : // Fixed-size cells on desktop: stretching 13 columns across a full-width
+              // band would produce enormous squares.
+              'grid grid-cols-[repeat(13,1fr)] gap-1 md:grid-cols-[repeat(auto-fill,minmax(28px,1fr))]'
+        }
+      >
         {cells.map((d) => {
           const iso = toISODate(d)
           const count = d > today ? 0 : days[iso] ?? 0
@@ -89,12 +97,12 @@ export function JourneyHeatmap({
               type="button"
               title={`${formatLongDay(d)} — ${count} ${count === 1 ? 'activity' : 'activities'}`}
               onClick={() => count > 0 && setOpenDay(selected ? null : iso)}
-              className={`aspect-square ${HEAT[level]} ${
+              className={`${HEAT[level]} ${
                 range === 'week'
-                  ? `flex flex-col items-center justify-center gap-0.5 rounded-cell ${
+                  ? `flex aspect-square flex-col items-center justify-center gap-0.5 rounded-cell md:aspect-auto md:h-14 ${
                       level >= 2 ? 'text-white' : 'text-muted'
                     }`
-                  : 'rounded-[4px]'
+                  : 'aspect-square rounded-[4px] md:max-w-[32px]'
               } ${selected ? 'outline outline-2 outline-offset-2 outline-ink' : ''}`}
             >
               {range === 'week' && (

@@ -8,6 +8,9 @@ export default {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      // The design's two breakpoints. `wide` is where a single stacked card in the
+      // feed column starts reading too long and thin, so it goes 2-up.
+      screens: { wide: '1400px' },
       colors: {
         ink: '#3c3c3c',        // --text-dark
         muted: '#777777',      // --text-muted
@@ -40,7 +43,7 @@ export default {
       borderWidth: { 2: '2px' },
       // The design is a fixed 412px phone column. Wider viewports get the same column,
       // widened only where a grid genuinely benefits (the activity feed).
-      maxWidth: { page: '412px', wide: '900px' },
+      maxWidth: { page: '412px' },
       fontFamily: { sans: ['var(--font-inter)', 'system-ui', 'sans-serif'] },
     },
   },

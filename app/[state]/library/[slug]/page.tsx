@@ -47,16 +47,40 @@ export default async function LibraryProfilePage({ params }: Params) {
   }
 
   return (
-    <main className="w-full max-w-page bg-white md:max-w-wide">
+    <main className="w-full max-w-page bg-white md:max-w-none">
       <ProfileHeader profile={data.profile} />
 
-      <div className="flex flex-col gap-[31px] px-5 pb-[60px] pt-6">
-        <JourneyHeatmap journey={data.journey} submissions={data.submissions} />
-        <Achievements achievements={data.achievements} />
-        <ImpactGrid impact={data.impact} />
-        <BadgeList badges={data.badges} />
-        <AudiencePills audiences={data.audiences} />
-        <SubmissionFeed submissions={data.submissions} />
+      {/*
+        Mobile: one column, in the order the sections are written.
+        Desktop: a named two-column grid — audience band across the top, activity feed
+        on the left with the stat sidebar on the right, journey band across the bottom.
+        Placement is explicit so the desktop arrangement does not depend on DOM order,
+        which lets mobile keep its own sequence.
+      */}
+      <div
+        className="flex flex-col gap-[31px] px-5 pb-[60px] pt-6
+                   md:grid md:grid-cols-[1fr_372px] md:items-start md:gap-10
+                   md:px-[clamp(40px,6vw,120px)] md:pb-16 md:pt-8
+                   wide:px-[clamp(120px,10vw,220px)]"
+      >
+        <div className="md:col-span-2 md:col-start-1 md:row-start-3">
+          <JourneyHeatmap journey={data.journey} submissions={data.submissions} />
+        </div>
+
+        {/* Nested a level deeper than the other sections, so it carries its own gap. */}
+        <div className="flex flex-col gap-[31px] md:col-start-2 md:row-start-2">
+          <Achievements achievements={data.achievements} />
+          <ImpactGrid impact={data.impact} />
+          <BadgeList badges={data.badges} />
+        </div>
+
+        <div className="md:col-span-2 md:col-start-1 md:row-start-1">
+          <AudiencePills audiences={data.audiences} />
+        </div>
+
+        <div className="md:col-start-1 md:row-start-2">
+          <SubmissionFeed submissions={data.submissions} />
+        </div>
       </div>
 
       <footer className="px-5 pb-10 text-center text-[13px] text-faint">
